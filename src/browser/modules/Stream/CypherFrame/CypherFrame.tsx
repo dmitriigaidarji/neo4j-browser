@@ -51,6 +51,7 @@ import RelatableView, {
 import { VisualizationConnectedBus } from './VisualizationView/VisualizationView'
 import { WarningsStatusbar, WarningsView } from './WarningsView'
 import {
+  recordToStringArray,
   initialView,
   recordToJSONMapper,
   resultHasNodes,
@@ -58,8 +59,7 @@ import {
   resultHasRows,
   resultHasWarnings,
   resultIsError,
-  stringifyResultArray,
-  transformResultRecordsToResultArray
+  stringifyResultArray
 } from './helpers'
 import Centered from 'browser-components/Centered'
 import Display from 'browser-components/Display'
@@ -177,9 +177,12 @@ export class CypherFrame extends Component<CypherFrameProps, CypherFrameState> {
     const textDownloadEnabled = () =>
       this.getRecords().length > 0 &&
       this.state.openView &&
-      [ViewTypes.TEXT, ViewTypes.TABLE, ViewTypes.CODE].includes(
-        this.state.openView
-      )
+      [
+        ViewTypes.TEXT,
+        ViewTypes.TABLE,
+        ViewTypes.CODE,
+        ViewTypes.VISUALIZATION
+      ].includes(this.state.openView)
     const graphicsDownloadEnabled = () =>
       this.visElement &&
       this.state.openView &&
@@ -324,7 +327,7 @@ export class CypherFrame extends Component<CypherFrameProps, CypherFrameState> {
             maxRows={this.props.maxRows}
             result={result}
             updated={this.props.request.updated}
-            setAsciiMaxColWidth={asciiMaxColWidth =>
+            setAsciiMaxColWidth={(asciiMaxColWidth: number) =>
               this.setState({ asciiMaxColWidth })
             }
           />
@@ -384,7 +387,7 @@ export class CypherFrame extends Component<CypherFrameProps, CypherFrameState> {
             maxRows={this.props.maxRows}
             result={result}
             updated={this.props.request.updated}
-            setAsciiSetColWidth={asciiSetColWidth =>
+            setAsciiSetColWidth={(asciiSetColWidth: string) =>
               this.setState({ asciiSetColWidth })
             }
           />
@@ -421,9 +424,12 @@ export class CypherFrame extends Component<CypherFrameProps, CypherFrameState> {
 
   exportCSV = (): void => {
     const records = this.getRecords()
+    const firstRecord = records[0]
+    const keys = firstRecord?.length > 0 ? firstRecord.keys : []
+
     const exportData = stringifyResultArray(
       csvFormat,
-      transformResultRecordsToResultArray(records)
+      [keys].concat(records.map(record => recordToStringArray(record)))
     )
     const data = exportData.slice()
     const csv = CSVSerializer(data.shift())
@@ -529,4 +535,9 @@ const mapDispatchToProps = (dispatch: Dispatch<SetRecentViewAction>) => ({
   }
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(CypherFrame)
+// @ts-ignore
+const CypherFrameExport: any = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CypherFrame)
+export default CypherFrameExport

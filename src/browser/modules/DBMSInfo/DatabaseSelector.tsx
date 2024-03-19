@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { uniqBy } from 'lodash'
 import React from 'react'
 import styled from 'styled-components'
 
@@ -27,7 +26,7 @@ import {
   DrawerSubHeader
 } from 'browser-components/drawer/drawer-styled'
 import { escapeCypherIdentifier } from 'services/utils'
-import { Database } from 'shared/modules/dbMeta/dbMetaDuck'
+import { Alias, Database } from 'shared/modules/dbMeta/dbMetaDuck'
 
 const Select = styled.select`
   width: 100%;
@@ -38,20 +37,21 @@ const Select = styled.select`
 const EMPTY_OPTION = 'Select db to use'
 
 const HOUSE_EMOJI = '\u{1F3E0}'
-const HOUR_GLASS_EMOJI = '\u{231B}'
 const NBSP_CHAR = '\u{00A0}'
 
 type DatabaseSelectorProps = {
-  databases?: Database[]
-  selectedDb?: string
+  uniqueDatabases?: Database[]
+  selectedDb: string
   onChange?: (dbName: string) => void
+  aliases: Alias[]
 }
 export const DatabaseSelector = ({
-  databases = [],
-  selectedDb = '',
+  uniqueDatabases = [],
+  selectedDb,
+  aliases,
   onChange = () => undefined
 }: DatabaseSelectorProps): JSX.Element | null => {
-  if (databases.length === 0) {
+  if (uniqueDatabases.length === 0) {
     return null
   }
   const selectionChange = ({
@@ -62,23 +62,29 @@ export const DatabaseSelector = ({
     }
   }
 
-  // When connected to a cluster, we get duplicate dbs for each member
-  const uniqDatabases = uniqBy(databases, 'name')
-
   const homeDb =
-    uniqDatabases.find(db => db.home) || uniqDatabases.find(db => db.default)
+    uniqueDatabases.find(db => db.home) ||
+    uniqueDatabases.find(db => db.default)
 
-  const aliasList = uniqDatabases.flatMap(db =>
-    db.aliases
-      ? db.aliases.map(alias => ({
-          databaseName: db.name,
-          name: alias,
-          status: db.status
-        }))
-      : []
-  )
+  const aliasList = aliases.flatMap(alias => {
+    const aliasedDb = uniqueDatabases.find(db => db.name === alias.database)
 
-  const databasesAndAliases = [...aliasList, ...uniqDatabases].sort((a, b) =>
+    // Don't show composite aliases since they can't be queried directly
+    if (alias.composite) {
+      return []
+    }
+
+    if (aliasedDb === undefined) {
+      return []
+    }
+
+    return {
+      name: alias.name,
+      status: aliasedDb.status
+    }
+  })
+
+  const databasesAndAliases = [...aliasList, ...uniqueDatabases].sort((a, b) =>
     a.name.localeCompare(b.name)
   )
 
@@ -96,31 +102,24 @@ export const DatabaseSelector = ({
           )}
 
           {databasesAndAliases.map(dbOrAlias => {
-            //If alias
-            if ('databaseName' in dbOrAlias) {
-              return (
-                <option
-                  key={dbOrAlias.name}
-                  value={dbOrAlias.databaseName}
-                  disabled={dbOrAlias.status === 'unknown'}
-                >
-                  {dbOrAlias.name}
-                </option>
-              )
-            }
+            /* When deduplicating the list of databases and aliases on clusters
+             we prefer to find ones that are "online". If our deduplicated
+             db is not online, it means none of the databases on the cluster with
+             that name is online, so we should disable it in the list and show 
+             one of the statuses as a simplification (even though they could 
+              technically be different)
+             */
+            const dbNotOnline = dbOrAlias.status !== 'online'
 
-            //If database
             return (
               <option
                 key={dbOrAlias.name}
                 value={dbOrAlias.name}
-                disabled={dbOrAlias.status === 'unknown'}
+                disabled={dbNotOnline}
               >
                 {dbOrAlias.name}
                 {dbOrAlias === homeDb ? NBSP_CHAR + HOUSE_EMOJI : ''}
-                {dbOrAlias.status === 'unknown'
-                  ? NBSP_CHAR + HOUR_GLASS_EMOJI
-                  : ''}
+                {dbNotOnline && ` [${dbOrAlias.status}]`}
               </option>
             )
           })}

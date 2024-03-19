@@ -42,7 +42,8 @@ import {
   forceCount,
   getCountAutomaticRefreshLoading,
   getCountAutomaticRefreshEnabled,
-  getDatabases
+  getUniqueDatabases,
+  getAliases
 } from 'shared/modules/dbMeta/dbMetaDuck'
 import { getGraphStyleData } from 'shared/modules/grass/grassDuck'
 import { Button } from '@neo4j-ndl/react'
@@ -73,15 +74,23 @@ export function DBMSInfo(props: any): JSX.Element {
     nodes,
     relationships
   } = props.meta
-  const { user, onItemClick, onDbSelect, useDb = '', databases = [] } = props
+  const {
+    user,
+    onItemClick,
+    onDbSelect,
+    useDb,
+    uniqueDatabases = [],
+    aliases
+  } = props
 
   return (
     <Drawer id="db-drawer">
       <DrawerHeader>Database Information</DrawerHeader>
       <DrawerBody>
         <DatabaseSelector
-          databases={databases}
-          selectedDb={useDb}
+          uniqueDatabases={uniqueDatabases}
+          aliases={aliases}
+          selectedDb={useDb ?? ''}
           onChange={onDbSelect}
         />
         {!props.countAutoRefreshing && (
@@ -138,15 +147,19 @@ export function DBMSInfo(props: any): JSX.Element {
 
 const mapStateToProps = (state: any) => {
   const useDb = getUseDb(state)
-  const databases = getDatabases(state)
   const countAutoRefreshing = getCountAutomaticRefreshEnabled(state)
   const countLoading = getCountAutomaticRefreshLoading(state)
+
+  const uniqueDatabases = getUniqueDatabases(state)
+  const aliases = getAliases(state)
+
   return {
     graphStyleData: getGraphStyleData(state),
     meta: state.meta,
     user: getCurrentUser(state),
     useDb,
-    databases,
+    uniqueDatabases,
+    aliases,
     countAutoRefreshing,
     countLoading
   }

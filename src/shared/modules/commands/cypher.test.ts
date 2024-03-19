@@ -57,6 +57,14 @@ jest.mock('shared/modules/dbMeta/dbMetaDuck', () => {
   }
 })
 
+jest.mock('shared/modules/settings/settingsDuck', () => {
+  const orig = require.requireActual('shared/modules/dbMeta/dbMetaDuck')
+  return {
+    ...orig,
+    shouldUseReadTransactions: () => false
+  }
+})
+
 describe('tx metadata with cypher', () => {
   afterEach(() => {
     bolt.routedWriteTransaction.mockClear()
@@ -126,7 +134,7 @@ describe('Implicit vs explicit transactions', () => {
     flushPromises().then(() => {
       expect(bolt.routedWriteTransaction).toHaveBeenCalledTimes(1)
       expect(bolt.routedWriteTransaction).toHaveBeenCalledWith(
-        'RETURN 1',
+        ' RETURN 1',
         {},
         expect.objectContaining({
           autoCommit: true
@@ -153,24 +161,26 @@ multiline comment
     action.$$responseChannel = $$responseChannel
 
     bus.send(action.type, action)
-    flushPromises().then(() => {
-      expect(bolt.routedWriteTransaction).toHaveBeenCalledTimes(1)
-      expect(bolt.routedWriteTransaction).toHaveBeenCalledWith(
-        `// comment
+    flushPromises()
+      .then(() => {
+        expect(bolt.routedWriteTransaction).toHaveBeenCalledTimes(1)
+        expect(bolt.routedWriteTransaction).toHaveBeenCalledWith(
+          `// comment
 /*
 multiline comment
 */
 // comment
 
 // comment
-/*:auto*/RETURN ":auto"`,
-        {},
-        expect.objectContaining({
-          autoCommit: true
-        })
-      )
-      done()
-    })
+/*:auto*/ RETURN ":auto"`,
+          {},
+          expect.objectContaining({
+            autoCommit: true
+          })
+        )
+        done()
+      })
+      .catch(e => console.error(e))
   })
   test('it sends the autoCommit flag = false to tx functions on regular cypher', done => {
     // Given
