@@ -46,7 +46,8 @@ export function mapNodes(nodes: BasicNode[]): NodeModel[] {
         node.id,
         node.labels,
         mapProperties(node.properties),
-        node.propertyTypes
+        node.propertyTypes,
+        node.elementId
       )
   )
 }
@@ -65,7 +66,8 @@ export function mapRelationships(
         target,
         rel.type,
         mapProperties(rel.properties),
-        rel.propertyTypes
+        rel.propertyTypes,
+        rel.elementId
       )
     })
     .filter(t => t.source != undefined && t.target != undefined)
