@@ -44,7 +44,13 @@ describe('DatabaseSelector', () => {
     const databases: Database[] = []
 
     // When
-    const { container } = render(<DatabaseSelector databases={databases} />)
+    const { container } = render(
+      <DatabaseSelector
+        selectedDb=""
+        uniqueDatabases={databases}
+        aliases={[]}
+      />
+    )
 
     // Then
     expect(container).toMatchInlineSnapshot('<div />')
@@ -56,7 +62,11 @@ describe('DatabaseSelector', () => {
 
     // When
     const { getByDisplayValue, queryByDisplayValue, rerender } = render(
-      <DatabaseSelector databases={databases} selectedDb={selected} />
+      <DatabaseSelector
+        uniqueDatabases={databases}
+        selectedDb={selected}
+        aliases={[]}
+      />
     )
 
     // Then
@@ -65,7 +75,13 @@ describe('DatabaseSelector', () => {
 
     // When
     selected = 'molly'
-    rerender(<DatabaseSelector databases={databases} selectedDb={selected} />)
+    rerender(
+      <DatabaseSelector
+        uniqueDatabases={databases}
+        selectedDb={selected}
+        aliases={[]}
+      />
+    )
 
     // Then
     expect(getByDisplayValue(/molly/i)).toBeDefined()
@@ -73,7 +89,13 @@ describe('DatabaseSelector', () => {
 
     // When
     selected = ''
-    rerender(<DatabaseSelector databases={databases} selectedDb={selected} />)
+    rerender(
+      <DatabaseSelector
+        uniqueDatabases={databases}
+        selectedDb={selected}
+        aliases={[]}
+      />
+    )
 
     // Then select db text should be shown
     expect(getByDisplayValue(/select db/i)).toBeDefined()
@@ -87,7 +109,12 @@ describe('DatabaseSelector', () => {
 
     // When
     const { getByTestId } = render(
-      <DatabaseSelector databases={databases} onChange={onChange} />
+      <DatabaseSelector
+        uniqueDatabases={databases}
+        selectedDb=""
+        onChange={onChange}
+        aliases={[]}
+      />
     )
     const select = getByTestId(testId)
 
@@ -112,7 +139,12 @@ describe('DatabaseSelector', () => {
 
     // When
     const { getByTestId } = render(
-      <DatabaseSelector databases={databases} onChange={onChange} />
+      <DatabaseSelector
+        selectedDb=""
+        uniqueDatabases={databases}
+        onChange={onChange}
+        aliases={[]}
+      />
     )
     const select = getByTestId(testId)
 
