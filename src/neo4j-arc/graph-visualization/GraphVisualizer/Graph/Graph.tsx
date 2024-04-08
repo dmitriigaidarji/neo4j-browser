@@ -22,6 +22,7 @@ import React from 'react'
 import {
   BasicNode,
   BasicRelationship,
+  GraphLayoutIcon,
   ZoomInIcon,
   ZoomOutIcon,
   ZoomToFitIcon
@@ -49,6 +50,7 @@ import { Visualization } from './visualization/Visualization'
 import { WheelZoomInfoOverlay } from './WheelZoomInfoOverlay'
 import { StyledSvgWrapper, StyledZoomButton, StyledZoomHolder } from './styled'
 import { ResizeObserver } from '@juggle/resize-observer'
+import GraphLayoutModal from '../../../../browser/modules/Stream/CypherFrame/VisualizationView/PropertiesPanelContent/modal/graphlayout/GraphLayoutModal'
 
 export type GraphProps = {
   isFullscreen: boolean
@@ -82,6 +84,7 @@ type GraphState = {
   zoomInLimitReached: boolean
   zoomOutLimitReached: boolean
   displayingWheelZoomInfoMessage: boolean
+  graphLayoutModalOpen: boolean
 }
 
 export class Graph extends React.Component<GraphProps, GraphState> {
@@ -95,7 +98,8 @@ export class Graph extends React.Component<GraphProps, GraphState> {
     this.state = {
       zoomInLimitReached: false,
       zoomOutLimitReached: false,
-      displayingWheelZoomInfoMessage: false
+      displayingWheelZoomInfoMessage: false,
+      graphLayoutModalOpen: false
     }
     this.svgElement = React.createRef()
     this.wrapperElement = React.createRef()
@@ -227,6 +231,12 @@ export class Graph extends React.Component<GraphProps, GraphState> {
     this.wrapperResizeObserver.disconnect()
   }
 
+  closeGraphLayoutModal = () => {
+    this.setState({
+      graphLayoutModalOpen: false
+    })
+  }
+
   handleZoomEvent = (limitsReached: ZoomLimitsReached): void => {
     if (
       limitsReached.zoomInLimitReached !== this.state.zoomInLimitReached ||
@@ -263,6 +273,17 @@ export class Graph extends React.Component<GraphProps, GraphState> {
 
   zoomToFitClicked = (): void => {
     this.visualization?.zoomByType(ZoomType.FIT)
+  }
+
+  layoutClicked = (): void => {
+    this.setState({
+      graphLayoutModalOpen: true
+    })
+  }
+
+  acceptLayoutClicked = (props: any): void => {
+    this.visualization?.applyLayout(props)
+    this.closeGraphLayoutModal()
   }
 
   render(): JSX.Element {
@@ -303,12 +324,20 @@ export class Graph extends React.Component<GraphProps, GraphState> {
           >
             <ZoomToFitIcon large={isFullscreen} />
           </StyledZoomButton>
+          <StyledZoomButton aria-label={'layout'} onClick={this.layoutClicked}>
+            <GraphLayoutIcon large={isFullscreen} />
+          </StyledZoomButton>
         </StyledZoomHolder>
         {wheelZoomInfoMessageEnabled && displayingWheelZoomInfoMessage && (
           <WheelZoomInfoOverlay
             onDisableWheelZoomInfoMessage={disableWheelZoomInfoMessage}
           />
         )}
+        <GraphLayoutModal
+          isOpen={this.state.graphLayoutModalOpen}
+          onClose={this.closeGraphLayoutModal}
+          onAccept={this.acceptLayoutClicked}
+        />
       </StyledSvgWrapper>
     )
   }

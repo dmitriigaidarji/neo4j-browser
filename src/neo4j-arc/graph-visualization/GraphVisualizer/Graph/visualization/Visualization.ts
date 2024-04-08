@@ -48,6 +48,7 @@ import {
 } from './renderers/init'
 import { nodeMenuRenderer } from './renderers/menu'
 import { ZoomLimitsReached, ZoomType } from '../../../types'
+import { setGraphLayout } from './layout/layout'
 
 type MeasureSizeFn = () => { width: number; height: number }
 
@@ -242,6 +243,11 @@ export class Visualization {
     this.render()
   }
 
+  applyLayout = (props: any): void => {
+    setGraphLayout(this.graph, props)
+    this.render()
+    this.zoomByType(ZoomType.FIT)
+  }
   zoomByType = (zoomType: ZoomType): void => {
     this.draw = true
     this.isZoomClick = true

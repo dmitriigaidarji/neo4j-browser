@@ -4,7 +4,8 @@ const toExport = {
   plugins: [
     'react-hot-loader/babel',
     '@babel/plugin-proposal-class-properties',
-    'babel-plugin-dynamic-import-node'
+    'babel-plugin-dynamic-import-node',
+    '@babel/plugin-proposal-private-methods'
   ],
   presets: [
     '@babel/preset-react',
