@@ -26,6 +26,12 @@ const PropertyLabel = styled.label`
 const PropertyRadio = styled.input`
   vertical-align: middle;
 `
+const PropertyInput = styled.input`
+  vertical-align: middle;
+  margin-left: 5px;
+  color: black;
+  padding: 0 5px;
+`
 const PropertyLabelSpan = styled.span<{ underline?: boolean }>`
   vertical-align: middle;
   margin-left: 5px;
@@ -84,6 +90,15 @@ const SetupLabelProperties: React.FC<IProps> = ({
       })),
     [propertyKeys]
   )
+
+  const [customInput, setCustomInput] = React.useState('')
+  const handleCustomInputChange: React.ChangeEventHandler<HTMLInputElement> =
+    React.useCallback(
+      event => {
+        setCustomInput(event.target.value)
+      },
+      [setCustomInput]
+    )
 
   const handleRadioInputChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -147,6 +162,21 @@ const SetupLabelProperties: React.FC<IProps> = ({
               <PropertyLabelSpan underline={true}>
                 Display nothing
               </PropertyLabelSpan>
+            </PropertyLabel>
+            <PropertyLabel>
+              <PropertyRadio
+                type={'radio'}
+                name={inputName}
+                value={customInput}
+                checked={customInput === selectedCaption}
+                onChange={handleRadioInputChange}
+              />
+              <PropertyInput
+                type={'text'}
+                value={customInput}
+                onChange={handleCustomInputChange}
+                onBlur={handleRadioInputChange}
+              />
             </PropertyLabel>
             <PropertyLabel key={idSelectorValue}>
               <PropertyRadio
