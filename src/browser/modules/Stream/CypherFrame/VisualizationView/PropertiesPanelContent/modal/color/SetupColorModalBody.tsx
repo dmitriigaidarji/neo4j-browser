@@ -36,6 +36,7 @@ const SetupColorModalBody: React.FC<
     handlePropertyChange,
     isForNode
   } = props
+  console.log('b1', properties, Object.keys(properties))
   const keys = React.useMemo(
     () =>
       Object.keys(properties).sort((a, b) =>

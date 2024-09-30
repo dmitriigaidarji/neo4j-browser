@@ -34,6 +34,7 @@ export function DetailsPane({
   nodes,
   relationships
 }: DetailsPaneProps): JSX.Element {
+  console.log('a4', nodes, relationships)
   const [maxPropertiesCount, setMaxPropertiesCount] = useState(
     DETAILS_PANE_STEP_SIZE
   )

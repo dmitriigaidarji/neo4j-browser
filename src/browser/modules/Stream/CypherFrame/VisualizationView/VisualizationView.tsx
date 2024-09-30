@@ -309,8 +309,6 @@ LIMIT ${withLimit ? maxNewNeighbours : 10000}`
           fetchNeighbours={this.fetchNeighbours.bind(this)}
           nodes={this.state.nodes}
           autocompleteRelationships={this.props.autoComplete ?? false}
-          graphNodes={this.graph?.nodes() ?? []}
-          graphRelationships={this.graph?.relationships() ?? []}
           relationships={this.state.relationships}
           isFullscreen={this.props.isFullscreen}
           assignVisElement={this.props.assignVisElement}
