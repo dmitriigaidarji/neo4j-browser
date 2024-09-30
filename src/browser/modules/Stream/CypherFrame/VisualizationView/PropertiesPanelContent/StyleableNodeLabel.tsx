@@ -18,12 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import { Popup } from 'semantic-ui-react'
 
 import { StyledLabelChip } from 'neo4j-arc/common'
 import { GraphStyleModel } from 'neo4j-arc/graph-visualization'
 
 import { GrassEditor } from './GrassEditor'
+import { StyledPopup } from './styled'
 import { RelationshipModel } from 'neo4j-arc/graph-visualization/models/Relationship'
 import { NodeModel } from 'neo4j-arc/graph-visualization/models/Node'
 import { useTheme } from 'styled-components'
@@ -58,9 +58,8 @@ export function StyleableNodeLabel({
 
   const [open, wrapperRef, handleClick] = usePopupControlled(onClick)
   const theme = useTheme()
-  // console.log(theme)
   return (
-    <Popup
+    <StyledPopup
       style={React.useMemo(
         //@ts-ignore
         () => ({ backgroundColor: theme.editorBackground }),
@@ -93,7 +92,7 @@ export function StyleableNodeLabel({
           relationships={relationships}
         />
       </div>
-    </Popup>
+    </StyledPopup>
   )
 }
 
