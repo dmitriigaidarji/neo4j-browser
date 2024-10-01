@@ -112,7 +112,7 @@ type SavedScript = {
   isStatic: boolean
   name?: string
 }
-
+const asdasdasd = 1;
 export function MainEditor({
   bus,
   codeFontLigatures,
