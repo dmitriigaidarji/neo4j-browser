@@ -88,10 +88,11 @@ type GrassEditorProps = {
 export function stringSorter(a: string, b: string) {
   const an = a as unknown as number
   const bn = b as unknown as number
-  // TODO: HANDLE BOOLS
   if (!isNaN(an) && !isNaN(bn)) {
     return an - bn
   } else {
+    a = a + ''
+    b = b + ''
     return a.localeCompare(b, undefined, { sensitivity: 'base' })
   }
 }
@@ -396,7 +397,6 @@ export class GrassEditorComponent extends Component<GrassEditorProps> {
         properties[key] = Array.from(propertiesSet[key]).sort(stringSorter)
       }
     }
-    console.log('a2', propertiesSet, items)
     return (
       <StyledInlineListItem key="color-type-picker">
         <StyledInlineList className="color-type-picker picker">
@@ -439,7 +439,6 @@ export class GrassEditorComponent extends Component<GrassEditorProps> {
       const propertyKeys = (
         this.props.selectedLabel.propertyKeys as string[]
       ).sort(stringSorter)
-      console.log('a3', this.props.selectedLabel.label, this.props.nodes)
       pickers = [
         this.labelPicker(
           styleForLabel.selector,

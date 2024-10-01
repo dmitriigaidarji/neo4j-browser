@@ -7,7 +7,6 @@ import SetupColorStorage, { ISetupColorStorageProps } from './SetupColorStorage'
 const SetupColorModal: React.FC<
   Omit<ISetupColorStorageProps, 'doClose'>
 > = props => {
-  console.log('a1', props)
   const [open, setOpen] = React.useState(false)
   const doOpen = React.useCallback(() => setOpen(true), [])
   const doClose = React.useCallback(() => setOpen(false), [])

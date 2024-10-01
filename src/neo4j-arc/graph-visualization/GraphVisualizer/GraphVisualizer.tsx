@@ -287,7 +287,6 @@ export class GraphVisualizer extends Component<
     const graphStyle = this.state.freezeLegend
       ? new GraphStyleModel(this.props.useGeneratedDefaultColors)
       : this.state.graphStyle
-    console.log('a8', this.props, this.state)
     return (
       <StyledFullSizeContainer id="svg-vis">
         <Graph

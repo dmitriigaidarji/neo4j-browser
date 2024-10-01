@@ -47,7 +47,6 @@ export function StyleableNodeLabel({
   nodes,
   relationships
 }: StyleableNodeLabelProps): JSX.Element {
-  console.log('a6', nodes, relationships)
   const labels = selectedLabel.label === '*' ? [] : [selectedLabel.label]
   const graphStyleForLabel = graphStyle.forNode({
     labels: labels
